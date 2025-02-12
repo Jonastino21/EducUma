@@ -5,17 +5,16 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Alert
+  Alert,
+  Image,
 } from "react-native";
-import { StackNavigationProp } from "@react-navigation/stack";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
-import { launchImageLibrary } from "react-native-image-picker";
 import * as ImagePicker from "expo-image-picker";
 import "./../../global.css";
 
 const RegisterStudentScreen = ({ navigation }) => {
-  // État pour gérer l'ouverture des sections
+  // États pour gérer les informations des sections
   const [personalInfoOpen, setPersonalInfoOpen] = useState(true);
   const [academicInfoOpen, setAcademicInfoOpen] = useState(false);
 
@@ -33,12 +32,7 @@ const RegisterStudentScreen = ({ navigation }) => {
   const [filiere, setFiliere] = useState("");
 
   // Listes pour les menus déroulants
-  const institutions = [
-    "ISSTM",
-    "IUTAM",
-    "IUGM"
-  ];
-
+  const institutions = ["ISSTM", "IUTAM", "IUGM"];
   const filieres = [
     "Informatique",
     "Génie Logiciel",
@@ -47,14 +41,11 @@ const RegisterStudentScreen = ({ navigation }) => {
     "Intelligence Artificielle",
     "Systèmes Embarqués",
   ];
+  const niveaux = ["L1", "L2", "L3", "M1", "M2"];
 
-  const niveaux = [
-    "L1",
-    "L2",
-    "L3",
-    "M1",
-    "M2",
-  ];
+  // États pour l'image
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [photoName, setPhotoName] = useState<string | null>("");
 
   const togglePersonalInfo = () => {
     setPersonalInfoOpen(true);
@@ -65,11 +56,9 @@ const RegisterStudentScreen = ({ navigation }) => {
     setAcademicInfoOpen(true);
     setPersonalInfoOpen(false);
   };
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
 
-   // Fonction pour demander des permissions et ouvrir la galerie
-   const handlePhotoPick = async () => {
-    // Demander la permission d'accéder à la galerie
+  // Fonction pour demander des permissions et ouvrir la galerie
+  const handlePhotoPick = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (status !== "granted") {
@@ -80,18 +69,21 @@ const RegisterStudentScreen = ({ navigation }) => {
       return;
     }
 
-    // Ouvrir la galerie pour sélectionner une image
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Permet uniquement les images
-      allowsEditing: true, // Permet de recadrer l'image
-      quality: 1, // Qualité maximale
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
     });
 
     if (!result.canceled && result.assets) {
-      setPhotoUri(result.assets[0].uri); // Stocker l'URI de la photo sélectionnée
-      console.log("Photo sélectionnée : ", result.assets[0].uri);
+      const uri = result.assets[0].uri;
+      const fileName = uri.split("/").pop() ?? "Image non définie"; // Valeur par défaut si undefined
+      setPhotoUri(uri);
+      setPhotoName(fileName); // Mettre à jour le nom ou l'indication
+      console.log("Photo sélectionnée : ", uri);
     }
   };
+
   return (
     <ScrollView className="flex-1 bg-gray-100 px-5">
       <Text className="text-center text-2xl font-bold my-6">Inscription</Text>
@@ -143,13 +135,17 @@ const RegisterStudentScreen = ({ navigation }) => {
             value={password}
             onChangeText={setPassword}
           />
-           <TouchableOpacity
-        className="bg-gray-400 p-4 rounded-lg flex-row justify-center items-center mb-4"
-        onPress={handlePhotoPick}
-      >
-        <Text className="text-white font-semibold mr-2">Joindre une photo</Text>
-        <Icon name="camera" size={20} color="#fff" />
-      </TouchableOpacity>
+
+          {/* Bouton pour joindre une photo */}
+          <TouchableOpacity
+            className="bg-gray-400 p-4 rounded-lg flex-row justify-center items-center mb-4"
+            onPress={handlePhotoPick}
+          >
+            <Text className="text-white font-semibold mr-2">
+              {photoName ? photoName : "Joindre une photo"}
+            </Text>
+            <Icon name="camera" size={20} color="#fff" />
+          </TouchableOpacity>
         </View>
       )}
 
@@ -225,7 +221,7 @@ const RegisterStudentScreen = ({ navigation }) => {
         <Text className="text-center text-white font-semibold">S'inscrire</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
         <Text className="text-center text-blue-500 p-5 font-semibold">Retour</Text>
       </TouchableOpacity>
     </ScrollView>
