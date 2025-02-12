@@ -5,10 +5,13 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
+import { launchImageLibrary } from "react-native-image-picker";
+import * as ImagePicker from "expo-image-picker";
 import "./../../global.css";
 
 const RegisterStudentScreen = ({ navigation }) => {
@@ -62,7 +65,33 @@ const RegisterStudentScreen = ({ navigation }) => {
     setAcademicInfoOpen(true);
     setPersonalInfoOpen(false);
   };
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
 
+   // Fonction pour demander des permissions et ouvrir la galerie
+   const handlePhotoPick = async () => {
+    // Demander la permission d'accéder à la galerie
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission refusée",
+        "Vous devez autoriser l'accès à la galerie pour sélectionner une photo."
+      );
+      return;
+    }
+
+    // Ouvrir la galerie pour sélectionner une image
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Permet uniquement les images
+      allowsEditing: true, // Permet de recadrer l'image
+      quality: 1, // Qualité maximale
+    });
+
+    if (!result.canceled && result.assets) {
+      setPhotoUri(result.assets[0].uri); // Stocker l'URI de la photo sélectionnée
+      console.log("Photo sélectionnée : ", result.assets[0].uri);
+    }
+  };
   return (
     <ScrollView className="flex-1 bg-gray-100 px-5">
       <Text className="text-center text-2xl font-bold my-6">Inscription</Text>
@@ -114,12 +143,19 @@ const RegisterStudentScreen = ({ navigation }) => {
             value={password}
             onChangeText={setPassword}
           />
+           <TouchableOpacity
+        className="bg-gray-400 p-4 rounded-lg flex-row justify-center items-center mb-4"
+        onPress={handlePhotoPick}
+      >
+        <Text className="text-white font-semibold mr-2">Joindre une photo</Text>
+        <Icon name="camera" size={20} color="#fff" />
+      </TouchableOpacity>
         </View>
       )}
 
       {/* Section Informations Académiques */}
       <TouchableOpacity
-        className="bg-gray-200 p-3 rounded-lg mb-2 flex-row items-center justify-between"
+        className="bg-gray-200 p-3 mt-3 rounded-lg mb-2 flex-row items-center justify-between"
         onPress={toggleAcademicInfo}
       >
         <Text className="text-lg font-semibold">Informations académiques</Text>
