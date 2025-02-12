@@ -18,17 +18,17 @@ const EventDashboard = () => {
     {
       title: 'Atelier de Programmation',
       description: 'Apprenez à coder avec nos experts.',
-      image: 'https://example.com/event2.jpg',
+      image: 'https://scontent.fnbo1-1.fna.fbcdn.net/v/t39.30808-6/469672549_548616358057023_8804128681151579811_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeFBlxPZU2RS46gSwfEsXZ8iOTc_wrefAR05Nz_Ct58BHcrkeGP9ac9AvTIFAYWA0Z0A2w5Ckpm-RlVEH1RWN0nx&_nc_ohc=-MbbV37m3LYQ7kNvgEupz0o&_nc_oc=AdirZPXLLdHhnPwppMZYKFHonA8rzxAE2XpxqJq9zWwjeepPZU2XuRG78NADWPAuZ7twnlRbq4lFh8mYtK4sl4hy&_nc_zt=23&_nc_ht=scontent.fnbo1-1.fna&_nc_gid=ATSeVQ40-hyF1C1vtar9sMz&oh=00_AYATPpvlcnw5je7A8H8yzEKDU-v_mRwdW1-x5nDw-1sLGw&oe=67B27238',
     },
     {
       title: 'Exposition Artistique',
       description: 'Venez découvrir les œuvres de nos étudiants.',
-      image: 'https://example.com/event3.jpg',
+      image: 'https://scontent-mba2-1.xx.fbcdn.net/v/t39.30808-6/473008600_568936212691704_3484913740274492056_n.jpg?stp=c160.0.960.960a_dst-jpg_s206x206_tt6&_nc_cat=106&ccb=1-7&_nc_sid=50ad20&_nc_eui2=AeEihDg6BVeevXrW9FDVvuoNaTq9XjsjR8JpOr1eOyNHwrfDPb6a0LQ2RBe0vdKj19g3q7bEZkqxBAAcN9BlVHxB&_nc_ohc=f0BS7afRx5gQ7kNvgFbGAnT&_nc_oc=Adg13-PmqW98ae90T-iuUoewYubuHsSCZ8tZT-2zIRvc9VDyON5dYa4FhcQVOmYQIcgv54EW6sGaK51oWRLN7UkZ&_nc_zt=23&_nc_ht=scontent-mba2-1.xx&_nc_gid=AanjpIvYLvnS1KFgcV1PyCl&oh=00_AYCGTaB39RWfPHJBzV5oMHnsIQGmBG_FF0mNYFfD7b4x6A&oe=67B2698D',
     },
     {
       title: 'Festival de Musique',
       description: 'Venez profiter de la musique en plein air avec des artistes locaux.',
-      image: 'https://example.com/event4.jpg',
+      image: 'https://scontent-mba2-1.xx.fbcdn.net/v/t39.30808-6/475091640_580045651580760_4294970773027670818_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeErZC6SIeBfq7lLuJEuWssE2BHmSp_XF3_YEeZKn9cXf9ypi_8xcIOjsNtOlF0w5poIJVDNw2z0U04bPJFm4gvU&_nc_ohc=IHCPTM7sYOIQ7kNvgGCleKH&_nc_oc=AdiEa7Kwwj-uPAdTc9qlaqpcuEoydgXrdtRMo7jS5_PPyLPrFo4nOoUiDSfhCq9uXhe_v0qtwo_V7mF-zfpYDEmi&_nc_zt=23&_nc_ht=scontent-mba2-1.xx&_nc_gid=AN8hHXMv0rhfctRBuL5y__B&oh=00_AYAQcSP8wKZQrO1jVmrFZB2MDDEXqFjmWyFTj-QX26if_Q&oe=67B24457',
     },
   ];
 
@@ -59,11 +59,8 @@ const EventDashboard = () => {
   }, [fadeAnim, events.length]);
 
   return (
-    <View className="flex-1 items-center justify-center bg-gray-100">
+    <View className="flex-1 items-center  mt-5 bg-gray-100">
       <Animated.View
-        style={{
-          opacity: fadeAnim,
-        }}
         className="w-11/12 bg-white rounded-2xl overflow-hidden shadow-lg"
       >
         <Image

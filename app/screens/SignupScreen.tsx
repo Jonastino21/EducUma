@@ -222,7 +222,9 @@ const RegisterStudentScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-        <Text className="text-center text-blue-500 p-5 font-semibold">Retour</Text>
+        <Text className="text-center text-blue-500 p-5 font-semibold">
+          Retour
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );

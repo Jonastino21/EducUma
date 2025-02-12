@@ -26,7 +26,7 @@ const LoginScreen = ({ navigation }) => {
     <View className="flex-1 justify-center bg-gray-100 px-5">
       <Text className="text-center text-2xl font-bold mb-6">Connexion</Text>
       <Image
-        source={require("./../../assets/images/educuma.png")} // Remplacez par le chemin de votre image
+        source={require("./../../assets/images/logo_ok.png")} // Remplacez par le chemin de votre image
         style={{
           width: 100,
           height: 100,
