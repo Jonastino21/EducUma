@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Linking } from 'react-native';
-import TimeTable from '../components/emploi_du_temps'; // Assurez-vous que ce composant est correctement importé.
+import TimeTable from '../components/emploi_du_temps'; // Assurez-vous que ce composant est correctement 
+import ResourcesSection from './CoursRessource';
 
 const CoursModule = () => {
   const [showTimeTable, setShowTimeTable] = useState(false);
@@ -57,9 +58,8 @@ const CoursModule = () => {
 
         {showResources && (
           <View className="mt-4">
-            <Text className="text-lg font-bold">Ressources Pédagogiques</Text>
             {/* Placez ici votre composant RessourcesPedagogiques */}
-            <Text className="mt-2">Contenu des ressources pédagogiques ici...</Text>
+            <ResourcesSection/>
           </View>
         )}
       </ScrollView>

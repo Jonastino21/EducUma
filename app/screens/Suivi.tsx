@@ -60,8 +60,8 @@ const StudentApp = () => {
 
         <View className="flex-row flex-wrap justify-between mb-4">
           <View className="bg-white p-4 rounded-lg shadow-sm w-[48%]">
-            <Text className="text-gray-600">Moyenne</Text>
-            <Text className="text-2xl font-bold text-blue-500">{calculateAverage()}/20</Text>
+          <Text className="text-gray-600">Résultats examen</Text>
+          <Text className="text-green-500 mt-2 font-bold">Session validé</Text>
           </View>
           <View className="bg-white p-4 rounded-lg shadow-sm w-[48%]">
             <Text className="text-gray-600">Devoirs à rendre</Text>

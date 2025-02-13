@@ -57,7 +57,7 @@ const EventDashboard = () => {
 
       // Mise à jour de l'index pour passer à l'élément suivant
       setCurrentIndex((prevIndex) => (prevIndex + 1) % events.length);
-    }, 3000);
+    }, 4000);
 
     return () => clearInterval(interval); // Nettoyer l'intervalle
   }, [translateX, events.length]);

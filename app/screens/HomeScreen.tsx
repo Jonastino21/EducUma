@@ -12,7 +12,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/Ionicons";
 import AnalyticsDashboard from "./AccueilDash";
 import CoursModule from "./CourScreen";
-import LinkedInPost from "./PostDash";
+import {LinkedInPost,LinkedInPost2} from "./PostDash";
 import StudentApp from "./Suivi";
 
 const CoursScreen = () => (
@@ -33,6 +33,9 @@ const Home = () => (
     <AnalyticsDashboard />
     <View style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', marginVertical: 10 }} />
     <LinkedInPost />
+    <View style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', marginVertical: 10 }} />
+    <LinkedInPost2 />
+
   </ScrollView>
 );
 

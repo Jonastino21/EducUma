@@ -36,18 +36,6 @@ const MessageListScreen = ({ navigation }) => {
     );
   };
 
-  const deleteMessage = (messageId) => {
-    setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== messageId));
-  };
-
-  const archiveMessage = (messageId) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((msg) =>
-        msg.id === messageId ? { ...msg, archived: true } : msg
-      )
-    );
-  };
-
   const filteredMessages = messages.filter(message => {
     const matchesSearch =
       message.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -78,12 +66,6 @@ const MessageListScreen = ({ navigation }) => {
           <Text className="font-bold text-base">{item.sender}</Text>
           <View className="flex-row items-center space-x-2">
             <Text className="text-gray-500 text-sm">{item.timestamp}</Text>
-            <TouchableOpacity onPress={() => archiveMessage(item.id)}>
-              <Ionicons name="archive-outline" size={23} color="#6B7280" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => deleteMessage(item.id)}>
-              <Ionicons name="trash-outline" size={23} color="#ff5733" />
-            </TouchableOpacity>
           </View>
         </View>
         <Text className="text-sm mt-1 text-gray-600" numberOfLines={1}>
@@ -96,7 +78,7 @@ const MessageListScreen = ({ navigation }) => {
   return (
     <View className="flex-1 bg-white">
       <View className="bg-blue-600 p-4">
-        <Text className="text-white text-xl font-bold mb-4">Messages</Text>
+        <Text className="text-white text-xl mt-3 font-bold mb-4">Messages</Text>
         <View className="flex-row bg-white rounded-lg p-2 items-center">
           <Ionicons name="search-outline" size={20} color="#9CA3AF" />
           <TextInput
