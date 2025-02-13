@@ -12,8 +12,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/Ionicons";
 import AnalyticsDashboard from "./AccueilDash";
 import CoursModule from "./CourScreen";
-import LinkedInPost from "./PostDash";
 import { AppContext } from "../AppContext";
+import {LinkedInPost,LinkedInPost2} from "./PostDash";
+import StudentApp from "./Suivi";
 
 const CoursScreen = () => (
 
@@ -35,11 +36,15 @@ const Home = () => (
     <AnalyticsDashboard />
     <View style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', marginVertical: 10 }} />
     <LinkedInPost />
+    <View style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', marginVertical: 10 }} />
+    <LinkedInPost2 />
+
   </ScrollView>
 );
 
 const SuiviScreen = () => (
   <View className="flex-1 justify-center items-center bg-gray-100">
+    <StudentApp/>
   </View>
 );
 
@@ -49,7 +54,6 @@ export default function App() {
   
   const { state, setState } = useContext(AppContext);
   console.log(state);
-
   const [isMenuVisible, setIsMenuVisible] = useState(false);
 
   return (
@@ -140,11 +144,7 @@ export default function App() {
               <Text className="text-black text-sm font-medium">Paramètres</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="py-2"
-              onPress={() => {
-                console.log("Se déconnecter");
-                setIsMenuVisible(false);
-              }}
+              className="py-2"onPress={() => navigation.navigate("Login")}
             >
               <Text className="text-red-500 text-sm font-medium">
                 Se déconnecter
@@ -155,4 +155,4 @@ export default function App() {
       </Modal>
     </>
   );
-}
+};

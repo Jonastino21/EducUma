@@ -55,13 +55,16 @@ const MessageListScreen = ({ navigation }) => {
   };
 
 
-  const archiveMessage = (messageId) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((msg) =>
-        msg.id === messageId ? { ...msg, archived: true } : msg
-      )
-    );
-  };
+  const filteredMessages = messages.filter(message => {
+    const matchesSearch =
+      message.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      message.content.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter =
+      activeFilter === 'all' ||
+      (activeFilter === 'unread' && message.unread) ||
+      (activeFilter === 'archived' && message.archived);
+    return matchesSearch && matchesFilter;
+  });
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -83,6 +86,7 @@ const MessageListScreen = ({ navigation }) => {
             <TouchableOpacity onPress={() => archiveMessage(item.id)}>
               <Ionicons name="archive-outline" size={23} color="#6B7280" />
             </TouchableOpacity>
+
           </View>
         </View>
         <Text className="text-sm mt-1 text-gray-600" numberOfLines={1}>
@@ -95,7 +99,7 @@ const MessageListScreen = ({ navigation }) => {
   return (
     <View className="flex-1 bg-white">
       <View className="bg-blue-600 p-4">
-        <Text className="text-white text-xl font-bold mb-4">Messages</Text>
+        <Text className="text-white text-xl mt-3 font-bold mb-4">Messages</Text>
         <View className="flex-row bg-white rounded-lg p-2 items-center">
           <Ionicons name="search-outline" size={20} color="#9CA3AF" />
           <TextInput

@@ -1,17 +1,24 @@
-import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { emploiDuTemps } from '../screens/CourScreen';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, Dimensions } from 'react-native';
 
-interface Course{
+interface Course {
   subject: string;
   professor: string;
+}
+
+type emploiDuTemps = {
+  subject: string;
+  teacherName: string;
+  start: string;
+  end: string;
+  day: string;
 };
 
 type TimeSlot = {
   id: string;
   time: string;
   courses: {
-    [key: string]: Course | null; // key est le jour (lundi, mardi, etc.)
+    [key: string]: Course | null;
   };
 };
 
@@ -20,109 +27,106 @@ function timeToMinutes(time: string): number {
   return hours * 60 + minutes;
 }
 
-function filterScheduleToShow(schedule: emploiDuTemps[], timeRange: string, day: string): Course[] {
+function filterScheduleToShow(schedule: emploiDuTemps[], timeRange: string, day: string): Course | null {
   const [startRange, endRange] = timeRange.split('-').map(t => timeToMinutes(t));
 
-  return schedule.filter(({ start, end, day: courseDay }) => {
-      const startTime = timeToMinutes(start);
-      const endTime = timeToMinutes(end);
+  const matchedCourse = schedule.find(({ start, end, day: courseDay }) => {
+    const startTime = timeToMinutes(start);
+    const endTime = timeToMinutes(end);
 
-      return courseDay.toLowerCase() === day.toLowerCase() && 
-             startTime <= startRange && endTime >= endRange;
-    })
-    .map(({ subject, teacherName }) => ({
-      subject,
-      professor: teacherName,
-    }));
+    return (
+      courseDay.toLowerCase() === day.toLowerCase() &&
+      startTime <= startRange && 
+      endTime >= endRange
+    );
+  });
+
+  return matchedCourse ? { subject: matchedCourse.subject, professor: matchedCourse.teacherName } : null;
 }
 
-
-
-const TimeTable = ({schedules}:{schedules:emploiDuTemps[]}) => {
-  // Les créneaux horaires
-  
+const TimeTable = ({ schedules }: { schedules: emploiDuTemps[] }) => {
+  // Création des plages horaires
   const heures = Array.from({ length: 11 }, (_, i) => {
     const startHour = 7 + i;
-    const start = startHour.toString().padStart(2, "0") + ":00";
-    const end = (startHour + 1).toString().padStart(2, "0") + ":00";
+    const start = `${startHour.toString().padStart(2, "0")}:00`;
+    const end = `${(startHour + 1).toString().padStart(2, "0")}:00`;
     return `${start}-${end}`;
   });
-  
-  console.log(heures);
-  
 
-  
-  // Liste des jours de la semaine
-  const jours = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
-  
-  // Générer dynamiquement les timeSlots
+  const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+
+  // Création des créneaux horaires avec les cours correspondants
   const timeSlots: TimeSlot[] = heures.map((time, index) => ({
     id: (index + 1).toString(),
     time,
     courses: Object.fromEntries(
-      jours.map((jour) => [jour, filterScheduleToShow(schedules, time, jour)[0]])
+      jours.map(jour => [jour, filterScheduleToShow(schedules, time, jour)])
     ) as TimeSlot["courses"],
   }));
 
+  const CELL_WIDTH = 120; 
+  const CELL_HEIGHT = 80; 
 
-  const days = ['Horaires', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  const days = ['Horaires', ...jours];
 
-  // Composant pour une cellule du tableau
-  const TableCell = ({ children, isHeader = false, isTimeColumn = false }) => (
-    <View 
-      className={`
-        flex-1 p-2 border border-gray-300 
-        ${isHeader ? 'bg-blue-500' : 'bg-white'}
-        ${isTimeColumn ? 'bg-gray-100' : ''}
-        justify-center items-center
-        min-w-[120px] h-20
-      `}
+  // Composant cellule optimisé
+  const TableCell = ({ children, isHeader = false, isTimeColumn = false }: { children: React.ReactNode, isHeader?: boolean, isTimeColumn?: boolean }) => (
+    <View
+      style={{
+        width: CELL_WIDTH,
+        height: CELL_HEIGHT,
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        backgroundColor: isHeader ? '#3B82F6' : isTimeColumn ? '#F3F4F6' : '#FFFFFF',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 4,
+      }}
     >
-      <Text 
-        className={`
-          text-center
-          ${isHeader ? 'text-white font-bold' : 'text-gray-800'}
-          ${isTimeColumn ? 'font-medium' : ''}
-        `}
+      <Text
+        numberOfLines={3}
+        ellipsizeMode="tail"
+        style={{
+          textAlign: 'center',
+          color: isHeader ? '#FFFFFF' : '#1F2937',
+          fontWeight: isHeader || isTimeColumn ? 'bold' : 'normal',
+          fontSize: isHeader ? 14 : 12,
+        }}
       >
         {children}
       </Text>
-      
     </View>
   );
-  
+
   return (
-    <View className="flex-1 bg-gray-50">
-      <Text className="text-xl font-bold text-center py-4 bg-white">
+    <View style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingVertical: 10, backgroundColor: 'white' }}>
         Emploi du Temps
       </Text>
-      
-      <ScrollView horizontal>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={true} contentContainerStyle={{ flexGrow: 1 }}>
         <View>
           {/* En-tête du tableau avec les jours */}
-          <View className="flex-row">
+          <View style={{ flexDirection: 'row' }}>
             {days.map((day) => (
               <TableCell key={day} isHeader={true}>
                 {day}
               </TableCell>
             ))}
           </View>
-  
-          {/* Corps du tableau avec hauteur uniforme */}
+
+          {/* Corps du tableau */}
           {timeSlots.map((slot) => (
-            <View key={slot.id} className="flex-row h-20"> 
-              {/* Colonne des horaires */}
+            <View key={slot.id} style={{ flexDirection: 'row' }}>
               <TableCell isTimeColumn={true}>
                 {slot.time}
               </TableCell>
-  
-              {/* Cellules pour chaque jour */}
-              {Object.values(slot.courses).map((course, index) => (
+
+              {jours.map((jour, index) => (
                 <TableCell key={`${slot.id}-${index}`}>
-                  {course ? (
-                    <View style={{flex:1,flexDirection:"row"}}>
-                      <Text className="font-medium">{course.subject}</Text>
-                      <Text className="text-sm text-gray-600">{course.professor}</Text>
+                  {slot.courses[jour] ? (
+                    <View>
+                      <Text>{slot.courses[jour]?.subject}{"\n"} {slot.courses[jour]?.professor}</Text>
                     </View>
                   ) : (
                     '---'
@@ -135,7 +139,6 @@ const TimeTable = ({schedules}:{schedules:emploiDuTemps[]}) => {
       </ScrollView>
     </View>
   );
-  
 };
 
 export default TimeTable;

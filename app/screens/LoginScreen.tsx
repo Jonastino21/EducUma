@@ -32,7 +32,7 @@ const LoginScreen = ({ navigation }) => {
       return;
     }
 
-    const apiUrl = 'http://192.168.1.188:8080/auth/login';
+    const apiUrl = 'http://192.168.43.173:8080/auth/login';
 
 try {
       const response = await axios.post(apiUrl, {

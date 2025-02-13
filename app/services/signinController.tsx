@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { RegisterStudentInfo } from '../screens/SignupScreen';
 import { responseMessage } from '../screens/Chats';
 
-const API_BASE_URL = 'http://192.168.1.188:8080';
+const API_BASE_URL = 'http://192.168.43.173:8080';
 
 // Fonction pour l'inscription
 const register = async (registerState: RegisterStudentInfo) => {
