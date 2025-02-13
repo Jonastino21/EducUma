@@ -1,7 +1,8 @@
 import axios, { AxiosError } from 'axios';
 import { RegisterStudentInfo } from '../screens/SignupScreen';
+import { responseMessage } from '../screens/Chats';
 
-const API_BASE_URL = 'http://192.168.43.173:8080';
+const API_BASE_URL = 'http://192.168.1.188:8080';
 
 // Fonction pour l'inscription
 const register = async (registerState: RegisterStudentInfo) => {
@@ -101,5 +102,51 @@ const enmploi = async (school:donne) =>
       }
     }
   };
-export {enmploi,donne}
+
+  const envoiMessage= async(messageInfo:responseMessage)=>{
+    try {
+      const response = await axios.post(`${API_BASE_URL}/message/send`,messageInfo,{
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      return response.data; 
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        throw new Error( 'Erreur lors de l\'inscription.');
+      } else if (axiosError.request) {
+        throw new Error('Aucune réponse du serveur. Vérifiez votre connexion internet.');
+      } else {
+        throw new Error('Erreur lors de la configuration de la requête.');
+      }
+    }
+  };
+
+  interface ChatInfo{
+    chatId:number,
+    chatType:string,
+    before:0
+  }
+  const getMessages =async (groupInfo:ChatInfo)=>{try {
+    const response = await axios.post(`${API_BASE_URL}/message/get`,groupInfo,{
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data; 
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response) {
+      throw new Error( 'Erreur lors de l\'inscription.');
+    } else if (axiosError.request) {
+      throw new Error('Aucune réponse du serveur. Vérifiez votre connexion internet.');
+    } else {
+      throw new Error('Erreur lors de la configuration de la requête.');
+    }
+  }
+}
+
+
+export {enmploi,donne,envoiMessage,getMessages}
 export { registerWithPhoto };

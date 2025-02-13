@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import {
   View,
   Text,
@@ -13,8 +13,10 @@ import Icon from "react-native-vector-icons/Ionicons";
 import AnalyticsDashboard from "./AccueilDash";
 import CoursModule from "./CourScreen";
 import LinkedInPost from "./PostDash";
+import { AppContext } from "../AppContext";
 
 const CoursScreen = () => (
+
   <View className="flex-1 justify-center items-center bg-gray-100">
     <CoursModule />
 
@@ -28,6 +30,7 @@ const CommunicationScreen = () => (
 );
 
 const Home = () => (
+  
   <ScrollView className="flex-1 bg-gray-100">
     <AnalyticsDashboard />
     <View style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', marginVertical: 10 }} />
@@ -43,6 +46,10 @@ const SuiviScreen = () => (
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  
+  const { state, setState } = useContext(AppContext);
+  console.log(state);
+
   const [isMenuVisible, setIsMenuVisible] = useState(false);
 
   return (

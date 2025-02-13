@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, Alert } from "react-native";
+import React, { useContext, useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, AppState } from "react-native";
 import axios, { AxiosError } from 'axios';
 import "./../../global.css";
+import { AppContext } from "../AppContext";
 interface RegistrationInfo {
   email: string;
   password: string;
@@ -14,6 +15,7 @@ const LoginScreen = ({ navigation }) => {
     email: "",
     password: ""
   });
+  const { state, setState } = useContext(AppContext);
   // Fonction pour mettre à jour l'état des champs
   const handleInputChange = (field: keyof RegistrationInfo, value: string) => {
     setRegistrationState((prevState) => ({
@@ -30,7 +32,7 @@ const LoginScreen = ({ navigation }) => {
       return;
     }
 
-    const apiUrl = 'http://192.168.43.173:8080/auth/login';
+    const apiUrl = 'http://192.168.1.188:8080/auth/login';
 
 try {
       const response = await axios.post(apiUrl, {
@@ -43,6 +45,13 @@ try {
       });
 
       console.log('Réponse de l\'API:', response.data);
+      setState((prev: any) => ({ ...prev, user: {  userId: response.data.id,
+        userName: response.data.name,
+        userPhoto: response.data.picture,
+        school:response.data.school,
+        department:response.data.department,
+        level: response.data.level,
+        userGroup:response.data.chatGroups}}))
       navigation.navigate("Home");
       Alert.alert('Succès', 'Connexion réussie !');
       navigation.navigate('Home');

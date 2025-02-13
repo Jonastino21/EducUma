@@ -1,10 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { envoiMessage, getMessages } from '../services/signinController';
+import { AppContext } from '../AppContext';
+
+interface responseMessage{
+  content:string,
+  type:string,
+  from:number,
+  fromType:string,
+  to:number,
+  recipientType:string,
+}
+export {responseMessage}
 
 const MessageListScreen = ({ navigation }) => {
+
+  const {state , setState} = useContext(AppContext)
+
+
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
+  const [groupList,setGroupsList] = useState(state.user.userGroup)
   const [messages, setMessages] = useState([
     {
       id: '1',
@@ -27,6 +44,7 @@ const MessageListScreen = ({ navigation }) => {
       archived: false,
     },
   ]);
+
 
   const updateMessage = (messageId, newContent, timestamp) => {
     setMessages((prevMessages) =>
@@ -64,25 +82,20 @@ const MessageListScreen = ({ navigation }) => {
       className={`flex-row p-4 border-b border-gray-200 ${item.unread ? 'bg-blue-50' : 'bg-white'}`}
       onPress={() =>
         navigation.navigate('MessageDetail', {
-          message: item,
+          group: item,
           updateMessage,
         })
       }
     >
       <View className="relative">
-        <Image source={{ uri: item.avatar }} className="w-12 h-12 rounded-full" />
-        {item.online && <View className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />}
-      </View>
+        </View>
       <View className="flex-1 ml-4">
         <View className="flex-row justify-between items-center">
-          <Text className="font-bold text-base">{item.sender}</Text>
+          <Text className="font-bold text-base">{item.groupName}</Text>
           <View className="flex-row items-center space-x-2">
-            <Text className="text-gray-500 text-sm">{item.timestamp}</Text>
+            <Text className="text-gray-500 text-sm">{item?.timestamp}</Text>
             <TouchableOpacity onPress={() => archiveMessage(item.id)}>
               <Ionicons name="archive-outline" size={23} color="#6B7280" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => deleteMessage(item.id)}>
-              <Ionicons name="trash-outline" size={23} color="#ff5733" />
             </TouchableOpacity>
           </View>
         </View>
@@ -107,53 +120,68 @@ const MessageListScreen = ({ navigation }) => {
           />
         </View>
       </View>
-      <FlatList data={filteredMessages} renderItem={renderItem} keyExtractor={item => item.id} />
+      <FlatList data={groupList} renderItem={renderItem} keyExtractor={item => item.id} />
     </View>
   );
 };
 
 const MessageDetailScreen = ({ route, navigation }) => {
-  const { message, updateMessage } = route.params;
+  const { group, updateMessage } = route.params;
   const [newMessage, setNewMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState([
-    {
-      id: '1',
-      sender: message.sender,
-      content: message.content,
-      timestamp: message.timestamp,
-      isOutgoing: false,
-    },
-  ]);
-
-  const sendMessage = () => {
+  const [chatHistory, setChatHistory] = useState([]);
+  const {state , setState} = useContext(AppContext)
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        console.log({ chatId: group.id, chatType: "GROUP", before: 0 });
+        const data = await getMessages({ chatId: group.id, chatType: "GROUP", before: 0 });
+        console.error(data);
+        setChatHistory(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des messages:", error);
+      }
+    };
+  
+    fetchMessages();
+  }, [group.id]); // Ne se déclenche que lorsque le groupe change
+  const handleSubmit = ()=>{
+    setNewMessage('');
+    const sendMessage = async () => {
     if (newMessage.trim()) {
       const timestamp = new Date().toLocaleTimeString();
-      const newChat = {
-        id: Date.now().toString(),
-        sender: 'Vous',
-        content: newMessage,
-        timestamp,
-        isOutgoing: true,
-      };
-
-      setChatHistory([...chatHistory, newChat]);
-      updateMessage(message.id, newMessage, timestamp);
-      setNewMessage('');
+      
+    
+      const messageToSend:responseMessage = {
+        content: newMessage.trim(),
+        type: 'TEXT',
+        from: state.user.userId,
+        fromType: 'STUDENT',
+        to: group.id,
+        recipientType: 'GROUP',
+      }
+      const messageResponse = await envoiMessage(messageToSend);
+      setChatHistory([messageResponse,...chatHistory]);
+      updateMessage(messageResponse.id, messageResponse, timestamp);
     }
-  };
+  }
+  sendMessage()
+};
+
+  const handleMessageTyped = (value)=>{
+      setNewMessage(value)
+  }
 
   return (
     <View className="flex-1 bg-white">
-      {/* Header */}
+      {/* Header */}vvb 
       <View className="bg-blue-600 p-4 flex-row items-center">
         <TouchableOpacity onPress={() => navigation.goBack()} className="mr-3">
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <View className="flex-row flex-1 items-center">
-          <Image source={{ uri: message.avatar }} className="w-10 h-10 rounded-full" />
           <View className="ml-3">
-            <Text className="text-white font-bold text-lg">{message.sender}</Text>
-            {message.online && <Text className="text-white text-sm opacity-80">En ligne</Text>}
+            <Text className="text-white font-bold text-lg">{group.groupName}</Text>
+            {true && <Text className="text-white text-sm opacity-80">En ligne</Text>}
           </View>
         </View>
         <TouchableOpacity>
@@ -163,18 +191,18 @@ const MessageDetailScreen = ({ route, navigation }) => {
 
       <FlatList
         className="flex-1 px-4"
-        data={chatHistory}
+        data={[...chatHistory].reverse()}
         renderItem={({ item }) => (
           <View
             className={`max-w-[80%] p-4 rounded-lg my-2 ${
-              item.isOutgoing ? 'bg-blue-600 self-end' : 'bg-gray-200 self-start'
+              item.fromId == state.user.userId ? 'bg-blue-600 self-end' : 'bg-gray-200 self-start'
             }`}
           >
-            <Text className={`text-base ${item.isOutgoing ? 'text-white' : 'text-black'}`}>
+            <Text className={`text-base ${item.fromId == state.user.userId ? 'text-white' : 'text-black'}`}>
               {item.content}
             </Text>
-            <Text className={`text-xs ${item.isOutgoing ? 'text-gray-300' : 'text-gray-600'} mt-1`}>
-              {item.timestamp}
+            <Text className={`text-xs ${item.fromId == state.user.userId ? 'text-gray-300' : 'text-gray-600'} mt-1`}>
+              {item.creation}
             </Text>
           </View>
         )}
@@ -185,11 +213,11 @@ const MessageDetailScreen = ({ route, navigation }) => {
           className="flex-1 bg-gray-100 rounded-full px-4 py-2 mr-2"
           placeholder="Écrivez votre message..."
           value={newMessage}
-          onChangeText={setNewMessage}
+          onChangeText={handleMessageTyped}
         />
         <TouchableOpacity
           className={`p-3 rounded-full ${newMessage.trim() ? 'bg-blue-600' : 'bg-gray-400'}`}
-          onPress={sendMessage}
+          onPress={handleSubmit}
           disabled={!newMessage.trim()}
         >
           <Text className="text-white font-bold">Envoyer</Text>
