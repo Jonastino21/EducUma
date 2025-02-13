@@ -121,7 +121,7 @@ const RegisterStudentScreen = ({ navigation }) => {
     }
 
     try {
-      console.log("vody ee")
+      console.log("ouupss")
       // Appel à l'API d'inscription
       const response = await registerWithPhoto(photoUri,registerState);
       console.log('Réponse de l\'API:', response);

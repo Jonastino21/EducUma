@@ -1,7 +1,5 @@
 import axios, { AxiosError } from 'axios';
 import { RegisterStudentInfo } from '../screens/SignupScreen';
-import * as FileSystem from 'expo-file-system'; // Si vous utilisez Expo
-import mime from 'mime';
 
 const API_BASE_URL = 'http://192.168.43.173:8080';
 
@@ -13,17 +11,14 @@ const register = async (registerState: RegisterStudentInfo) => {
         'Content-Type': 'application/json',
       },
     });
-    return response.data; // Retourne les données de la réponse de l'API
+    return response.data; 
   } catch (error) {
     const axiosError = error as AxiosError;
     if (axiosError.response) {
-      // Si l'API renvoie une réponse d'erreur
       throw new Error( 'Erreur lors de l\'inscription.');
     } else if (axiosError.request) {
-      // Si la requête a été faite mais aucune réponse n'a été reçue
       throw new Error('Aucune réponse du serveur. Vérifiez votre connexion internet.');
     } else {
-      // Si une erreur s'est produite lors de la configuration de la requête
       throw new Error('Erreur lors de la configuration de la requête.');
     }
   }
@@ -31,44 +26,54 @@ const register = async (registerState: RegisterStudentInfo) => {
 
 // Fonction pour uploader une photo
 const uploadPhoto = async (photoUri: string) => {
-    if (!photoUri) {
-      throw new Error("Aucune image sélectionnée.");
-    }
-  
-    try {
-      // Obtenir le type MIME (image/jpeg, image/png, etc.)
-      const mimeType = mime.getType(photoUri);
-      
-      // Lire l'image sous forme de blob
-      const fileInfo = await FileSystem.getInfoAsync(photoUri);
-      if (!fileInfo.exists) {
-        throw new Error("Fichier introuvable.");
-      }
-  
-      // Créer un objet `FormData`
-      const formData = new FormData();
-      formData.append("file", {
-        uri: photoUri,
-        name: "profile_picture.jpg",
-        type: mimeType || "image/jpeg",
-      });
-  
-      // Envoyer via Axios
-      const response = await axios.post(`${API_BASE_URL}/file/`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-  
-      return response.data; // Retourne la réponse de l’API
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response) {
-        throw new Error("Erreur lors de l'envoi de l'image.");
-      } else if (axiosError.request) {
-        throw new Error("Aucune réponse du serveur. Vérifiez votre connexion internet.");
-      } else {
-        throw new Error("Erreur lors de la configuration de la requête.");
-      }
-    }
+  console.log("yow")
+  if (!photoUri) {
+    throw new Error("Aucune image sélectionnée.");
+  }
+  try {
+  console.log(photoUri)
+  const formData = new FormData();
+  const file = {
+    uri: photoUri,
+    name: 'profile_picture.jpg', // Nom du fichier
+    type: 'image/jpeg', // Type MIME du fichier
   };
+
+  // Ajoute le fichier à FormData
+  formData.append('file', file as any);
+
+  console.log("form data")
+    const response = await axios.post(`${API_BASE_URL}/file/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    console.log(response)
+    return response.data; // Retour de l’API
+  } catch (error) {
+    console.log(error)
+    const axiosError = error as AxiosError;
+    if (axiosError.response) {
+      throw new Error('Erreur lors de l\'envoi de l\'image.');
+    } else if (axiosError.request) {
+      throw new Error('Aucune réponse du serveur. Vérifiez votre connexion internet.');
+    } else {
+      throw new Error('Erreur lors de la configuration de la requête.');
+    }
+  }
+};
+
+// Fonction pour l'inscription avec photo
+const registerWithPhoto = async (photoUri: string, studentInfo: RegisterStudentInfo) => {
+  try {
+    console.log("photo")
+    const photoInfo = await uploadPhoto(photoUri);
+    console.log(photoInfo)
+    studentInfo.pictureUri = photoInfo.viewUrl; // Ajoute l'URL de la photo aux informations de l'étudiant
+    return await register(studentInfo);
+  } catch (error) {
+    throw new Error('Erreur lors de l\'inscription avec photo.');
+  }
+};
+
+export { registerWithPhoto };
