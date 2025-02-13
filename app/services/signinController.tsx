@@ -75,5 +75,31 @@ const registerWithPhoto = async (photoUri: string, studentInfo: RegisterStudentI
     throw new Error('Erreur lors de l\'inscription avec photo.');
   }
 };
+interface donne{
+  school:string,
+  department:string,
+  level:string
+}
 
+const enmploi = async (school:donne) =>
+  {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/schedule/student`,school , {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      return response.data; 
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        throw new Error( 'Erreur lors de l\'inscription.');
+      } else if (axiosError.request) {
+        throw new Error('Aucune réponse du serveur. Vérifiez votre connexion internet.');
+      } else {
+        throw new Error('Erreur lors de la configuration de la requête.');
+      }
+    }
+  };
+export {enmploi,donne}
 export { registerWithPhoto };

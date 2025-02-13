@@ -8,7 +8,6 @@ type EventCard = {
 };
 
 const EventDashboard = () => {
-  // Données des événements
   const events: EventCard[] = [
     {
       title: 'Conférence Universitaire',
@@ -27,25 +26,30 @@ const EventDashboard = () => {
     },
     {
       title: 'Festival de Musique',
-      description: 'Venez profiter de la musique en plein air avec des artistes locaux.',
+      description: 'Profitez de la musique en plein air avec des artistes locaux.',
       image: 'https://scontent-mba2-1.xx.fbcdn.net/v/t39.30808-6/475091640_580045651580760_4294970773027670818_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeErZC6SIeBfq7lLuJEuWssE2BHmSp_XF3_YEeZKn9cXf9ypi_8xcIOjsNtOlF0w5poIJVDNw2z0U04bPJFm4gvU&_nc_ohc=IHCPTM7sYOIQ7kNvgGCleKH&_nc_oc=AdiEa7Kwwj-uPAdTc9qlaqpcuEoydgXrdtRMo7jS5_PPyLPrFo4nOoUiDSfhCq9uXhe_v0qtwo_V7mF-zfpYDEmi&_nc_zt=23&_nc_ht=scontent-mba2-1.xx&_nc_gid=AN8hHXMv0rhfctRBuL5y__B&oh=00_AYAQcSP8wKZQrO1jVmrFZB2MDDEXqFjmWyFTj-QX26if_Q&oe=67B24457',
     },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0); // Index de l'événement actuel
-  const fadeAnim = useState(new Animated.Value(1))[0]; // Animation d'opacité
+  const translateX = useState(new Animated.Value(300))[0]; // Animation pour translation
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Démarrage de l'effet de fondu
+      // Lancement de l'animation de translation
       Animated.sequence([
-        Animated.timing(fadeAnim, {
-          toValue: 0, // Fade-out
+        Animated.timing(translateX, {
+          toValue: -300, // Glissement hors écran à gauche
           duration: 500,
           useNativeDriver: true,
         }),
-        Animated.timing(fadeAnim, {
-          toValue: 1, // Fade-in
+        Animated.timing(translateX, {
+          toValue: 300, // Réinitialisation hors écran à droite
+          duration: 0,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateX, {
+          toValue: 0, // Glissement à sa place
           duration: 500,
           useNativeDriver: true,
         }),
@@ -56,26 +60,34 @@ const EventDashboard = () => {
     }, 3000);
 
     return () => clearInterval(interval); // Nettoyer l'intervalle
-  }, [fadeAnim, events.length]);
+  }, [translateX, events.length]);
 
   return (
-    <View className="flex-1 items-center  mt-5 bg-gray-100">
-      <Animated.View
-        className="w-11/12 bg-white rounded-2xl overflow-hidden shadow-lg"
-      >
-        <Image
-          source={{ uri: events[currentIndex].image }}
-          className="w-full h-48"
-          style={{ resizeMode: 'cover' }}
-        />
-        <View className="p-4">
-          <Text className="text-lg font-bold text-gray-900 mb-2">
-            {events[currentIndex].title}
-          </Text>
-          <Text className="text-sm text-gray-700">{events[currentIndex].description}</Text>
-        </View>
-      </Animated.View>
+    <View className="flex-1 items-center bg-gray-100">
+  <Animated.View
+    style={{
+      transform: [{ translateX }],
+      borderBottomLeftRadius: 16, // Radius en bas à gauche
+      borderBottomRightRadius: 16, // Radius en bas à droite
+      overflow: 'hidden', // Nécessaire pour respecter le radius sur l'image
+    }}
+    className="w-full bg-white shadow-lg"
+  >
+    <Image
+      source={{ uri: events[currentIndex].image }}
+      className="w-full h-40"
+      style={{ resizeMode: 'cover' }}
+    />
+
+    <View className="p-2">
+      <Text className="text-lg font-bold text-gray-900">
+        {events[currentIndex].title}
+      </Text>
+      <Text className="text-sm text-gray-700">{events[currentIndex].description}</Text>
     </View>
+  </Animated.View>
+</View>
+
   );
 };
 
