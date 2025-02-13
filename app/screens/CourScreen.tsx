@@ -23,9 +23,9 @@ const CoursModule = () => {
   };
 
   return (
-    <View className="flex-1 bg-gray-50 p-4">
+    <View className="flex-1 w-full bg-gray-50 p-4">
       {/* Boutons pour afficher les sections */}
-      <View className="mb-4">
+      <View className="mb-4 ">
         <TouchableOpacity
           onPress={toggleTimeTable}
           className="bg-blue-500 p-3 rounded-lg mb-3"
