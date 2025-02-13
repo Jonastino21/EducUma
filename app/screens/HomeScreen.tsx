@@ -6,14 +6,19 @@ import {
   TouchableOpacity,
   Modal,
   Pressable,
+  ScrollView
 } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/Ionicons";
 import AnalyticsDashboard from "./AccueilDash";
+import CoursModule from "./CourScreen";
+import LinkedInPost from "./PostDash";
+import ChatApp from "./Chats";
 
 const CoursScreen = () => (
   <View className="flex-1 justify-center items-center bg-gray-100">
-    <Text className="text-lg font-bold">Gestion des Cours</Text>
+    <CoursModule />
+
   </View>
 );
 
@@ -24,14 +29,16 @@ const CommunicationScreen = () => (
 );
 
 const Home = () => (
-  <View className="flex-1 bg-gray-100">
+  <ScrollView className="flex-1 bg-gray-100">
     <AnalyticsDashboard />
-  </View>
+    <View style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', marginVertical: 10 }} />
+    <LinkedInPost />
+  </ScrollView>
 );
 
 const SuiviScreen = () => (
   <View className="flex-1 justify-center items-center bg-gray-100">
-    <Text className="text-lg font-bold">Suivi Académique</Text>
+    <ChatApp />
   </View>
 );
 
@@ -68,7 +75,7 @@ export default function App() {
           headerTitle: "",
           headerRight: () => (
             <View className="flex-row items-center gap-3 pr-4">
-             <TouchableOpacity onPress={() => console.log("Chat!")}>
+              <TouchableOpacity onPress={SuiviScreen}>
                 <Icon name="chatbubbles-outline" size={25} color="white" />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => console.log("Notifications!")}>
@@ -79,11 +86,17 @@ export default function App() {
               </TouchableOpacity>
             </View>
           ),
-          headerLeft:() => (
-          <View>
-            
-          </View>
-          )
+          headerLeft: () => (
+            <View>
+              
+              <Text className="text-xl p-4 font-bold text-white">
+                <Text style={{ color: "orange" }}>E</Text>
+                duc
+                <Text style={{ color: "orange" }}>U</Text>
+                ma
+              </Text>
+            </View>
+          ),
         })}
       >
         <Tab.Screen name="Accueil" component={Home} />
