@@ -13,7 +13,6 @@ import Icon from "react-native-vector-icons/Ionicons";
 import AnalyticsDashboard from "./AccueilDash";
 import CoursModule from "./CourScreen";
 import LinkedInPost from "./PostDash";
-import ChatApp from "./Chats";
 
 const CoursScreen = () => (
   <View className="flex-1 justify-center items-center bg-gray-100">
@@ -38,7 +37,6 @@ const Home = () => (
 
 const SuiviScreen = () => (
   <View className="flex-1 justify-center items-center bg-gray-100">
-    <ChatApp />
   </View>
 );
 
@@ -50,7 +48,7 @@ export default function App() {
   return (
     <>
       <Tab.Navigator
-        screenOptions={({ route }) => ({
+        screenOptions={({ route, navigation }) => ({
           tabBarIcon: ({ color, size }) => {
             let iconName;
 
@@ -75,7 +73,7 @@ export default function App() {
           headerTitle: "",
           headerRight: () => (
             <View className="flex-row items-center gap-3 pr-4">
-              <TouchableOpacity onPress={SuiviScreen}>
+              <TouchableOpacity onPress={() => navigation.navigate("MessageList")}>
                 <Icon name="chatbubbles-outline" size={25} color="white" />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => console.log("Notifications!")}>
