@@ -54,9 +54,6 @@ const MessageListScreen = ({ navigation }) => {
     );
   };
 
-  const deleteMessage = (messageId) => {
-    setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== messageId));
-  };
 
   const archiveMessage = (messageId) => {
     setMessages((prevMessages) =>
@@ -65,17 +62,6 @@ const MessageListScreen = ({ navigation }) => {
       )
     );
   };
-
-  const filteredMessages = messages.filter(message => {
-    const matchesSearch =
-      message.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      message.content.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter =
-      activeFilter === 'all' ||
-      (activeFilter === 'unread' && message.unread) ||
-      (activeFilter === 'archived' && message.archived);
-    return matchesSearch && matchesFilter;
-  });
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
