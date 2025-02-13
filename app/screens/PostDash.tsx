@@ -19,8 +19,6 @@ const LinkedInPost = () => {
         <View className="ml-2 flex-1">
           <View className="flex-row items-center">
             <Text className="font-bold text-gray-900">Myriame Angelinah</Text>
-            <Text className="text-gray-500 mx-1">•</Text>
-            <Text className="text-gray-500">Abonné</Text>
           </View>
           <Text className="text-gray-500 text-sm">
             CEO | 50 % de moins sur vos coûts de dév, dispo immédiate et suivi
@@ -36,7 +34,7 @@ const LinkedInPost = () => {
         </Text>
         <Text className="text-gray-900">Les bourses internationales vous ouvrent la voie à des établissements prestigieux, tout en allégeant vos frais d'études.</Text>
         <Text className="text-gray-900">
-        Ne manquez pas cette chance de réaliser vos ambitions et de bâtir un avenir prometteur grâce à des soutiens financiers adaptés. 💜
+        Ne manquez pas cette chance de réaliser vos ambitions et de bâtir un avenir prometteur grâce à des soutiens financiers adaptés...
         </Text>
       </View>
 
@@ -54,29 +52,14 @@ const LinkedInPost = () => {
             className="w-4 h-4"
           />
         </View>
-        <Text className="text-gray-500 mx-2">•</Text>
       </View>
 
       {/* Action buttons */}
-      <View className="flex-row justify-between pt-2 border-t border-gray-200">
-        <TouchableOpacity className="flex-row items-center">
-          <HeartIcon size={24} color="#6B7280" />
-          <Text className="ml-2 text-gray-500">J'aime</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity className="flex-row items-center">
-          <ChatBubbleLeftIcon size={24} color="#6B7280" />
-          <Text className="ml-2 text-gray-500">Commenter</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity className="flex-row items-center">
-          <ArrowPathRoundedSquareIcon size={24} color="#6B7280" />
-          <Text className="ml-2 text-gray-500">Republier</Text>
-        </TouchableOpacity>
+      <View className="items-center pt-2 border-t border-gray-200">
 
         <TouchableOpacity className="flex-row items-center">
           <PaperAirplaneIcon size={24} color="#6B7280" />
-          <Text className="ml-2 text-gray-500">Envoyer</Text>
+          <Text className="ml-2 text-gray-500">Partager</Text>
         </TouchableOpacity>
       </View>
 
@@ -98,8 +81,6 @@ const LinkedInPost2 = () => {
         <View className="ml-2 flex-1">
           <View className="flex-row items-center">
             <Text className="font-bold text-gray-900">Université de Mahajanga Officiel</Text>
-            <Text className="text-gray-500 mx-1">•</Text>
-            <Text className="text-gray-500">Abonné</Text>
           </View>
           <Text className="text-gray-500 text-sm">
             UMG | Enseignement supérieur
@@ -129,29 +110,13 @@ const LinkedInPost2 = () => {
             className="w-4 h-4"
           />
         </View>
-        <Text className="text-gray-500 mx-2">•</Text>
       </View>
 
       {/* Action buttons */}
-      <View className="flex-row justify-between pt-2 border-t border-gray-200">
-        <TouchableOpacity className="flex-row items-center">
-          <HeartIcon size={24} color="#6B7280" />
-          <Text className="ml-2 text-gray-500">J'aime</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity className="flex-row items-center">
-          <ChatBubbleLeftIcon size={24} color="#6B7280" />
-          <Text className="ml-2 text-gray-500">Commenter</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity className="flex-row items-center">
-          <ArrowPathRoundedSquareIcon size={24} color="#6B7280" />
-          <Text className="ml-2 text-gray-500">Republier</Text>
-        </TouchableOpacity>
-
+      <View className="items-center pt-2 border-t border-gray-200">
         <TouchableOpacity className="flex-row items-center">
           <PaperAirplaneIcon size={24} color="#6B7280" />
-          <Text className="ml-2 text-gray-500">Envoyer</Text>
+          <Text className="ml-2 text-gray-500">Partager</Text>
         </TouchableOpacity>
       </View>
       
