@@ -18,7 +18,6 @@ const MessageListScreen = ({ navigation }) => {
 
   const {state , setState} = useContext(AppContext)
 
-
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [groupList,setGroupsList] = useState(state.user.userGroup)

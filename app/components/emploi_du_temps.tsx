@@ -126,7 +126,7 @@ const TimeTable = ({ schedules }: { schedules: emploiDuTemps[] }) => {
                 <TableCell key={`${slot.id}-${index}`}>
                   {slot.courses[jour] ? (
                     <View>
-                      <Text>{slot.courses[jour]?.subject}{"\n"} {slot.courses[jour]?.professor}</Text>
+                      <Text>{slot.courses[jour]?.subject}{"\n\n"} {slot.courses[jour]?.professor}</Text>
                     </View>
                   ) : (
                     '---'

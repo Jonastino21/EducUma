@@ -1,4 +1,4 @@
-import React, { useState,useContext } from "react";
+import React, { useState,useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,7 +14,14 @@ import AnalyticsDashboard from "./AccueilDash";
 import CoursModule from "./CourScreen";
 import { AppContext } from "../AppContext";
 import {LinkedInPost,LinkedInPost2} from "./PostDash";
+
+
+import {Client} from '@stomp/stompjs';
+import SockJs from 'sockjs-client';
+
 import StudentApp from "./Suivi";
+import { configureNotification, createMessageNotif } from "../services/NotificationService";
+import EventDashboard from "./AccueilDash";
 
 const CoursScreen = () => (
 
@@ -30,17 +37,23 @@ const CommunicationScreen = () => (
   </View>
 );
 
-const Home = () => (
-  
-  <ScrollView className="flex-1 bg-gray-100">
-    <AnalyticsDashboard />
-    <View style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', marginVertical: 10 }} />
-    <LinkedInPost />
-    <View style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', marginVertical: 10 }} />
-    <LinkedInPost2 />
 
-  </ScrollView>
-);
+const Home = () => {
+  const { state } = useContext(AppContext);
+  const [events, setEvents] = useState(state.events); 
+
+  useEffect(() => {
+    setEvents(state.events);
+  }, [state.events]);  // Re-render dès qu'un nouvel événement est ajouté
+
+  return (
+    <ScrollView>
+      <EventDashboard/>
+      <LinkedInPost posts={events} />
+      <LinkedInPost2/>
+    </ScrollView>
+  );
+};
 
 const SuiviScreen = () => (
   <View className="flex-1 justify-center items-center bg-gray-100">
@@ -50,9 +63,82 @@ const SuiviScreen = () => (
 
 const Tab = createBottomTabNavigator();
 
+
 export default function App() {
   
-  const { state, setState } = useContext(AppContext);
+  const { state, setState,addEvent } = useContext(AppContext);
+  const [unreadMessages, setUnreadMessages] = useState(0)
+    const stompConfig = {
+      connectHeaders: {},
+      brokerURL: "ws://192.168.43.173:8080/ws",
+      forceBinaryWSFrames: true,
+      appendMissingNULLonIncoming: true,
+      debug: function (str) {
+          console.log('STOMP: ' + str);
+      },
+      reconnectDelay: 200,
+      onConnect: function (frame) {
+          console.log("connected")
+
+          state.user.userGroup.forEach((group) => {
+            stompClient.subscribe(`/topic/group/${group.id}`, async function (message) {
+              console.log(`📩 Message reçu pour le groupe ${group.id}:`, JSON.parse(message.body));
+              
+              const messageBody = JSON.parse(message.body);
+              setUnreadMessages((prev) => prev + 1);
+              // 🔔 Afficher une notification
+              await createMessageNotif(
+                `Nouveau message dans le groupe ${group.id}`,
+                messageBody.data.content,
+                { groupId: group.id }
+              );
+            });
+          });
+
+          stompClient.subscribe(`/topic/evenement`, async function (message) {
+            const messageBody = JSON.parse(message.body);
+            console.log("📩 Message reçu:", messageBody);
+        
+            // 🔔 Afficher une notification
+            await createMessageNotif(
+              `Evenement au sein de UM`,
+              messageBody.data.content,
+              { debut:messageBody.data.start }
+            );
+
+            const newEvent = {
+                sender: messageBody.data.sender,
+                title: messageBody.data.title,
+                content: messageBody.data.content,
+                attachmentLink: messageBody.data.attachmentLink,
+                id: messageBody.data.id || Math.random().toString(), // Assurez-vous que chaque event a un ID unique
+            };
+        
+            // 🔍 Vérifier si l'événement existe déjà dans state.events
+            if (!state.events.some(event => event.id === newEvent.id)) {
+                addEvent(newEvent);
+        
+                // 🔔 Envoyer une seule notification push
+                await createMessageNotif(
+                    "Nouvel Événement",
+                    `${newEvent.title} - ${newEvent.content}`,
+                    { eventId: newEvent.id }
+                );
+            }
+        });
+        
+        },
+      onStompError: (frame) => {
+          console.log('Additional details: ' + frame.body);
+      },
+  }
+  const stompClient = new Client(stompConfig);
+  useEffect(() => {
+    configureNotification();
+    stompClient.activate();
+  }, [])
+  
+  
   console.log(state);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
 
@@ -84,9 +170,18 @@ export default function App() {
           headerTitle: "",
           headerRight: () => (
             <View className="flex-row items-center gap-3 pr-4">
-              <TouchableOpacity onPress={() => navigation.navigate("MessageList")}>
-                <Icon name="chatbubbles-outline" size={25} color="white" />
-              </TouchableOpacity>
+              <TouchableOpacity onPress={() => {
+                  navigation.navigate("MessageList");
+                  setUnreadMessages(0); // Réinitialiser le compteur quand on ouvre les messages
+                }} className="relative">
+                  <Icon name="chatbubbles-outline" size={25} color="white" />
+                  {unreadMessages > 0 && (
+                    <View className="absolute -top-1 -right-1 bg-red-500 rounded-full w-5 h-5 flex items-center justify-center">
+                      <Text className="text-white text-xs font-bold">{unreadMessages}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+
               <TouchableOpacity onPress={() => console.log("Notifications!")}>
                 <Icon name="notifications-outline" size={25} color="white" />
               </TouchableOpacity>

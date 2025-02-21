@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import "./../../global.css";
 import {registerWithPhoto} from "../services/signinController"
+import { AppContext } from "../AppContext";
 
 // Interface pour les informations d'inscription
 interface RegisterStudentInfo {
@@ -33,6 +34,7 @@ const RegisterStudentScreen = ({ navigation }) => {
   // États pour gérer les sections
   const [personalInfoOpen, setPersonalInfoOpen] = useState(true);
   const [academicInfoOpen, setAcademicInfoOpen] = useState(false);
+  const {state,setState} = useContext(AppContext)
 
   // État pour les informations d'inscription
   const [registerState, setRegisterState] = useState<RegisterStudentInfo>({
@@ -126,6 +128,13 @@ const RegisterStudentScreen = ({ navigation }) => {
       const response = await registerWithPhoto(photoUri,registerState);
       console.log('Réponse de l\'API:', response);
       Alert.alert('Succès', 'Inscription réussie !');
+      setState((prev: any) => ({ ...prev, user: {  userId: response.id,
+        userName: response.name,
+        userPhoto: response.picture,
+        school:response.school,
+        department:response.department,
+        level: response.level,
+        userGroup:response.chatGroups}}))
       navigation.navigate('Home');
     } catch (error) {
       Alert.alert('Une erreur est survenue.');
@@ -254,7 +263,6 @@ const RegisterStudentScreen = ({ navigation }) => {
           <TextInput
             className="bg-white p-3 rounded-lg border border-gray-300 mb-4"
             placeholder="Matricule étudiants"
-            keyboardType="numeric"
             value={registerState.matricule}
             onChangeText={(value) => handleInputChange('matricule', value)}
           />
