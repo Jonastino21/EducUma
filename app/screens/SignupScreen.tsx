@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -12,41 +12,54 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import "./../../global.css";
+import {registerWithPhoto} from "../services/signinController"
+import { AppContext } from "../AppContext";
+
+// Interface pour les informations d'inscription
+interface RegisterStudentInfo {
+  name: string;
+  surname: string;
+  email: string;
+  password: string;
+  telephone: string;
+  school: string;
+  department: string;
+  level: string;
+  matricule: string;
+  pictureUri:String
+}
+export {RegisterStudentInfo}
 
 const RegisterStudentScreen = ({ navigation }) => {
-  // États pour gérer les informations des sections
+  // États pour gérer les sections
   const [personalInfoOpen, setPersonalInfoOpen] = useState(true);
   const [academicInfoOpen, setAcademicInfoOpen] = useState(false);
+  const {state,setState} = useContext(AppContext)
 
-  // États pour informations personnelles
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
+  // État pour les informations d'inscription
+  const [registerState, setRegisterState] = useState<RegisterStudentInfo>({
+    name: "",
+    surname: "",
+    email: "",
+    password: "",
+    telephone: "",
+    school: "",
+    department: "",
+    level: "",
+    matricule: "",
+    pictureUri:""
+  });
 
-  // États pour informations académiques
-  const [matricule, setMatricule] = useState("");
-  const [selectedLevel, setSelectedLevel] = useState("");
-  const [institution, setInstitution] = useState("");
-  const [filiere, setFiliere] = useState("");
-
-  // Listes pour les menus déroulants
-  const institutions = ["ISSTM", "IUTAM", "IUGM"];
-  const filieres = [
-    "Informatique",
-    "Génie Logiciel",
-    "Réseaux et Télécommunications",
-    "Sécurité Informatique",
-    "Intelligence Artificielle",
-    "Systèmes Embarqués",
-  ];
-  const niveaux = ["L1", "L2", "L3", "M1", "M2"];
-
-  // États pour l'image
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  // État pour l'image
+  const [photoUri, setPhotoUri] = useState<string>("");
   const [photoName, setPhotoName] = useState<string | null>("");
 
+  // Données pour les sélecteurs
+  const institutions = ["ISSTM", "Autre Établissement"];
+  const filieres = ["Génie Informatique", "Autre Filière"];
+  const niveaux = ["L1", "L2", "L3", "M1", "M2"];
+
+  // Fonctions pour basculer entre les sections
   const togglePersonalInfo = () => {
     setPersonalInfoOpen(true);
     setAcademicInfoOpen(false);
@@ -57,7 +70,7 @@ const RegisterStudentScreen = ({ navigation }) => {
     setPersonalInfoOpen(false);
   };
 
-  // Fonction pour demander des permissions et ouvrir la galerie
+  // Fonction pour sélectionner une photo
   const handlePhotoPick = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -77,10 +90,54 @@ const RegisterStudentScreen = ({ navigation }) => {
 
     if (!result.canceled && result.assets) {
       const uri = result.assets[0].uri;
-      const fileName = uri.split("/").pop() ?? "Image non définie"; // Valeur par défaut si undefined
+      const fileName = uri.split("/").pop() ?? "Image non définie";
       setPhotoUri(uri);
-      setPhotoName(fileName); // Mettre à jour le nom ou l'indication
+      setPhotoName(fileName);
       console.log("Photo sélectionnée : ", uri);
+    }
+  };
+
+  // Fonction pour mettre à jour les champs du formulaire
+  const handleInputChange = (field: keyof RegisterStudentInfo, value: string) => {
+    setRegisterState((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
+
+  // Fonction pour gérer l'inscription
+  const handleRegister = async () => {
+    const { name, surname, email, password, telephone, school, department, level, matricule } = registerState;
+
+    // Validation des champs obligatoires
+    if (!name || !surname || !email || !password || !telephone || !school || !department || !level || !matricule) {
+      Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
+      return;
+    }
+
+    // Validation de l'email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Erreur', 'Veuillez entrer une adresse email valide.');
+      return;
+    }
+
+    try {
+      console.log("ouupss")
+      // Appel à l'API d'inscription
+      const response = await registerWithPhoto(photoUri,registerState);
+      console.log('Réponse de l\'API:', response);
+      Alert.alert('Succès', 'Inscription réussie !');
+      setState((prev: any) => ({ ...prev, user: {  userId: response.id,
+        userName: response.name,
+        userPhoto: response.picture,
+        school:response.school,
+        department:response.department,
+        level: response.level,
+        userGroup:response.chatGroups}}))
+      navigation.navigate('Home');
+    } catch (error) {
+      Alert.alert('Une erreur est survenue.');
     }
   };
 
@@ -106,34 +163,34 @@ const RegisterStudentScreen = ({ navigation }) => {
           <TextInput
             className="bg-white p-3 rounded-lg border border-gray-300 mb-4"
             placeholder="Nom"
-            value={name}
-            onChangeText={setName}
+            value={registerState.name}
+            onChangeText={(value) => handleInputChange('name', value)}
           />
           <TextInput
             className="bg-white p-3 rounded-lg border border-gray-300 mb-4"
             placeholder="Prénoms"
-            value={surname}
-            onChangeText={setSurname}
+            value={registerState.surname}
+            onChangeText={(value) => handleInputChange('surname', value)}
           />
           <TextInput
             className="bg-white p-3 rounded-lg border border-gray-300 mb-4"
             placeholder="Téléphone"
-            value={phone}
-            onChangeText={setPhone}
+            value={registerState.telephone}
+            onChangeText={(value) => handleInputChange('telephone', value)}
           />
           <TextInput
             className="bg-white p-3 rounded-lg border border-gray-300 mb-4"
             placeholder="Email"
             keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
+            value={registerState.email}
+            onChangeText={(value) => handleInputChange('email', value)}
           />
           <TextInput
             className="bg-white p-3 rounded-lg border border-gray-300 mb-4"
             placeholder="Mot de passe"
             secureTextEntry
-            value={password}
-            onChangeText={setPassword}
+            value={registerState.password}
+            onChangeText={(value) => handleInputChange('password', value)}
           />
 
           {/* Bouton pour joindre une photo */}
@@ -166,8 +223,8 @@ const RegisterStudentScreen = ({ navigation }) => {
         <View>
           <View className="bg-white rounded-lg border border-gray-300 mb-4">
             <Picker
-              selectedValue={institution}
-              onValueChange={(itemValue) => setInstitution(itemValue)}
+              selectedValue={registerState.school}
+              onValueChange={(itemValue) => handleInputChange('school', itemValue)}
               className="p-3"
             >
               <Picker.Item label="Sélectionnez un établissement" value="" />
@@ -179,8 +236,8 @@ const RegisterStudentScreen = ({ navigation }) => {
 
           <View className="bg-white rounded-lg border border-gray-300 mb-4">
             <Picker
-              selectedValue={filiere}
-              onValueChange={(itemValue) => setFiliere(itemValue)}
+              selectedValue={registerState.department}
+              onValueChange={(itemValue) => handleInputChange('department', itemValue)}
               className="p-3"
             >
               <Picker.Item label="Sélectionnez une filière" value="" />
@@ -192,8 +249,8 @@ const RegisterStudentScreen = ({ navigation }) => {
 
           <View className="bg-white rounded-lg border border-gray-300 mb-4">
             <Picker
-              selectedValue={selectedLevel}
-              onValueChange={(itemValue) => setSelectedLevel(itemValue)}
+              selectedValue={registerState.level}
+              onValueChange={(itemValue) => handleInputChange('level', itemValue)}
               className="p-3"
             >
               <Picker.Item label="Sélectionnez un niveau" value="" />
@@ -206,9 +263,8 @@ const RegisterStudentScreen = ({ navigation }) => {
           <TextInput
             className="bg-white p-3 rounded-lg border border-gray-300 mb-4"
             placeholder="Matricule étudiants"
-            keyboardType="numeric"
-            value={matricule}
-            onChangeText={setMatricule}
+            value={registerState.matricule}
+            onChangeText={(value) => handleInputChange('matricule', value)}
           />
         </View>
       )}
@@ -216,7 +272,7 @@ const RegisterStudentScreen = ({ navigation }) => {
       {/* Bouton d'inscription */}
       <TouchableOpacity
         className="bg-blue-500 p-4 rounded-lg"
-        onPress={() => navigation.navigate("Login")}
+        onPress={handleRegister}
       >
         <Text className="text-center text-white font-semibold">S'inscrire</Text>
       </TouchableOpacity>

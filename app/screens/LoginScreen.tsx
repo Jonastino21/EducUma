@@ -1,26 +1,73 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, Alert } from "react-native";
-
+import React, { useContext, useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, AppState } from "react-native";
+import axios, { AxiosError } from 'axios';
 import "./../../global.css";
+import { AppContext } from "../AppContext";
+interface RegistrationInfo {
+  email: string;
+  password: string;
+}
+
 
 const LoginScreen = ({ navigation }) => {
   // États pour email et mot de passe
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  // Identifiants de test
-  const testEmail = "test@educuma.mg";
-  const testPassword = "test123";
-
+  const [registationState, setRegistrationState] = useState<RegistrationInfo>({
+    email: "",
+    password: ""
+  });
+  const { state, setState } = useContext(AppContext);
+  // Fonction pour mettre à jour l'état des champs
+  const handleInputChange = (field: keyof RegistrationInfo, value: string) => {
+    setRegistrationState((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
   // Fonction pour gérer la connexion
-  const handleLogin = () => {
-    if (email === testEmail && password === testPassword) {
-      Alert.alert("Succès", "Connexion réussie !");
-      navigation.navigate("Home"); // Redirige vers la page d'accueil
-    } else {
-      Alert.alert("Erreur", "Email ou mot de passe incorrect.");
+  const handleLogin = async () => {
+    const { email, password } = registationState;
+
+    if (!email || !password) {
+      Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
+      return;
+    }
+
+    const apiUrl = 'http://192.168.43.173:8080/auth/login';
+
+try {
+      const response = await axios.post(apiUrl, {
+        email,
+        password,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Réponse de l\'API:', response.data);
+      setState((prev: any) => ({ ...prev, user: {  userId: response.data.id,
+        userName: response.data.name,
+        userPhoto: response.data.picture,
+        school:response.data.school,
+        department:response.data.department,
+        level: response.data.level,
+        userGroup:response.data.chatGroups}}))
+      navigation.navigate("Home");
+      Alert.alert('Succès', 'Connexion réussie !');
+      navigation.navigate('Home');
+    } catch (error) {
+      const axiosError = error as AxiosError;
+
+      if (axiosError.response) {
+        Alert.alert('Une erreur est survenue.');
+      } else {
+      
+        Alert.alert('Erreur', 'Impossible de se connecter au serveur.');
+      }
     }
   };
+ 
+ 
 
   return (
     <View className="flex-1 justify-center bg-gray-100 px-5">
@@ -39,15 +86,15 @@ const LoginScreen = ({ navigation }) => {
         className="bg-white p-3 rounded-lg border border-gray-300 mb-4"
         placeholder="Email"
         keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
+        value={registationState.email}
+        onChangeText={(value) => handleInputChange('email', value)}
       />
       <TextInput
         className="bg-white p-3 rounded-lg border border-gray-300 mb-4"
         placeholder="Mot de passe"
         secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+         value={registationState.password}
+        onChangeText={(value) => handleInputChange('password', value)}
       />
       <TouchableOpacity className="bg-blue-500 p-4 rounded-lg mb-4" onPress={handleLogin}>
         <Text className="text-center text-white font-semibold">Se connecter</Text>
