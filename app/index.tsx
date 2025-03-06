@@ -6,7 +6,7 @@ import SignupScreen from "./screens/SignupScreen";
 import SplashScreen from "./screens/SplashScreen";
 import HomeScreen from "./screens/HomeScreen";
 import { MessageListScreen, MessageDetailScreen } from "./screens/Chats";
-import { AppProvider } from "./AppContext";
+
 
 const Stack = createStackNavigator();
 
@@ -20,7 +20,6 @@ export default function App() {
   }, []);
 
   return (
-    <AppProvider>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isLoading ? (
@@ -36,7 +35,6 @@ export default function App() {
         )}
       </Stack.Navigator>
     </NavigationContainer>
-    </AppProvider>
-    );
+  );
   
 }

@@ -30,7 +30,7 @@ const EventDashboard = () => {
       image: 'https://scontent-mba2-1.xx.fbcdn.net/v/t39.30808-6/475091640_580045651580760_4294970773027670818_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeErZC6SIeBfq7lLuJEuWssE2BHmSp_XF3_YEeZKn9cXf9ypi_8xcIOjsNtOlF0w5poIJVDNw2z0U04bPJFm4gvU&_nc_ohc=IHCPTM7sYOIQ7kNvgGCleKH&_nc_oc=AdiEa7Kwwj-uPAdTc9qlaqpcuEoydgXrdtRMo7jS5_PPyLPrFo4nOoUiDSfhCq9uXhe_v0qtwo_V7mF-zfpYDEmi&_nc_zt=23&_nc_ht=scontent-mba2-1.xx&_nc_gid=AN8hHXMv0rhfctRBuL5y__B&oh=00_AYAQcSP8wKZQrO1jVmrFZB2MDDEXqFjmWyFTj-QX26if_Q&oe=67B24457',
     },
   ];
-    
+
   const [currentIndex, setCurrentIndex] = useState(0); // Index de l'événement actuel
   const translateX = useState(new Animated.Value(300))[0]; // Animation pour translation
 
